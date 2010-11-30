@@ -1,0 +1,59 @@
+grammar Latex
+
+	rule document
+		token+ <Document>
+	end
+
+	rule token
+		verbatim / command / text
+	end
+
+	rule command
+		'\\' operation '[' options ']' '{' parameters '}' <Command> / command_no_parameters / command_no_options / command_simple
+	end
+
+	rule command_no_parameters
+		'\\' operation '[' options ']' <Command>
+	end
+
+	rule command_no_options
+		'\\' operation '{' parameters '}' <Command>
+	end
+
+	rule command_simple
+		'\\' operation '{}' <Command> / '\\' operation <Command>
+	end
+
+	rule operation
+		plain_text
+	end	
+
+	rule parameters
+		parameter ',' parameters <Parameters> / parameter <Parameter>
+	end
+
+	rule parameter
+		command / plain_text
+	end
+
+	rule options
+		parameters
+	end
+
+	rule plain_text
+		[^\\^\{^\}^\,^\[^\]]+ <Text>
+	end
+
+	rule verbatim
+		'\\begin{lstlisting}' ('[' [^\]]* ']')? verbatim_text '\\end{lstlisting}' <Verbatim>
+	end
+
+	rule verbatim_text
+		(!'\\end{lstlisting}' [\w\W])* <Text>
+	end
+
+	rule text
+		[^\\]+ <Text>
+	end
+
+end
